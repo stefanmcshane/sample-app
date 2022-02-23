@@ -1,3 +1,3 @@
-module github.com/perchcredit/my-new-service/service
+module github.com/perchcredit/sample-app/service
 
 go 1.17

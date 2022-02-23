@@ -1,0 +1,39 @@
+name: Go Build & Test
+
+on:
+  pull_request:
+    branches: [ main ]
+    
+jobs:
+  build:
+    name: Go ${{ matrix.go }} Validation
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go: [ '1.17' ]
+    
+    steps:
+
+    - name: Fix up git URLs
+      run: echo -e '[url "git@github.com:"]\n  insteadOf = "https://github.com/"' >> ~/.gitconfig
+
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+        ssh-key: ${{ secrets.SSH_MACHINE_KEY }}
+
+    - name: Setup Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ matrix.go }}
+      
+    - name: Install dependencies
+      run: make install-tools
+      
+    - name: Check for breaking changes
+      run: make break
+      
+    - name: Lint protos and go ${{ matrix.go }} code
+      run: make lint go-lint
+      

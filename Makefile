@@ -1,25 +1,16 @@
-# include common/make/common.makefile
+include common/make/common.mk
 
-# # Ensure the service name matches the name of the repo
-# SERVICE=my-new-service
+SERVICE=sample-app # Ensure the service name matches the name of the repo
 
-# # These are using for semantic versioning for Go binaries, and dockerfiles
-# # We use BUILD_NUMBER in place of PATCH for tracibility between CI tooling, and versioning
-# # This means that build number will increase indefinitely, alongside the job number in the CI tool
-# MAJOR=0
-# MINOR=0
-# BUILD_NUMBER=CI-TOOL-SETS-THISa
-# SEMVER?="$(MAJOR).$(MINOR).$(BUILD_NUMBER)-$(GIT_COMMIT)"
+## Top level
+build: go-build ## Run all builds for this repo
+clean: go-clean proto-clean ## Clean up anything extra folders
+lint: go-lint proto-lint docker-lint ## Run all available linters
+test: go-test ## Run all available unit tests
+test-coverage: go-test-cov-html ## Open browser with test coverage tool
+test-integration: go-test-integration ## Run all available integration tests
+install-tools: go-install-tools alderson-install-tools ## Install all required tools
+docker-build: docker-build-app docker-build-integration-tests ## Build all docker images
 
-# GIT_COMMIT=$(shell git log -1 --pretty=%h)
-# GIT_COMMIT_PREV=$(shell git log -2 --pretty=%h)
-# BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
-# GO_VERSION=$(shell go version)
-# GO_TAG="v$(MAJOR).$(MINOR).$(BUILD_NUMBER)"
-# DOCKER_IMAGE_NAME="$(SERVICE)-$(BRANCH):$(SEMVER)"
-
-# # DOCKER_REGISTRY if set, must end in /
-# DOCKER_REGISTRY?= 
-
-
+BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
 
