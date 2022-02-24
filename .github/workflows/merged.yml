@@ -1,4 +1,4 @@
-name: Create and Publish Image
+name: On Merge
 
 # on:
 #   pull_request:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: Build and publish container
+    name: Build and publish image
     runs-on: ubuntu-latest
 
     steps:
@@ -21,12 +21,14 @@ jobs:
       with:
         username: stefanmcshane
         password: ${{ secrets.IMAGE_REGISTRY_PASSWORD }}
-        
+
     - name: Checkout code
       uses: actions/checkout@v2
       with:
         submodules: recursive
         ssh-key: ${{ secrets.SSH_MACHINE_KEY }}
+    
+    - name: Build and publish image
       run: |
         docker build  -t "stefanmcshane/${{github.repository}}:latest" -t "stefanmcshane/${{github.repository}}:${{github.sha}}" . -f Dockerfile
         docker push stefanmcshane/${{github.repository}}:latest
