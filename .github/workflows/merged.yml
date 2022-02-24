@@ -40,7 +40,7 @@ jobs:
           echo ::set-output name=tagged_manifest::$(kustomize build)
 
     - name: Connect to Deployment repo
-      uses: tibdex/github-app-token@v1
+      uses: getsentry/action-github-app-token@v1
       id: generate-token
       with:
         app_id: ${{ secrets.GH_APP_ID }}
