@@ -11,6 +11,9 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "%s!", sayHello(r.URL.Path[1:]))
 	})
+	http.HandleFunc("/healthz/ready", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
