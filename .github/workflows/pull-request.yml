@@ -10,9 +10,10 @@ jobs:
     name: Go Validation
     runs-on: ubuntu-latest
     container:
-      image:
-        stefanmcshane/go-ci-tools:latest
-    
+      image: stefanmcshane/go-ci-tools:latest
+      credentials:
+          username: ${{ secrets.IMAGE_REGISTRY_USERNAME}}
+          password: ${{ secrets.IMAGE_REGISTRY_PASSWORD}}
     steps:
 
     - name: Fix up git URLs
