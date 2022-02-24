@@ -1,0 +1,31 @@
+name: Create and Publish Image
+
+# on:
+#   pull_request:
+#     branches: [ main ]
+on: push
+
+jobs:
+  build:
+    name: 
+    runs-on: ubuntu-latest
+    container:
+      image: stefanmcshane/go-ci-tools:latest
+      credentials:
+          username: stefanmcshane
+          password: ${{ secrets.IMAGE_REGISTRY_PASSWORD}}
+    steps:
+
+    - name: Fix up git URLs
+      run: echo -e '[url "git@github.com:"]\n  insteadOf = "https://github.com/"' >> ~/.gitconfig
+
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+        ssh-key: ${{ secrets.SSH_MACHINE_KEY }}
+      
+    - name: Lint
+      run: |
+        docker build  -t "stefanmcshane/${{github.repository}}:latest" -t "stefanmcshane/${{github.repository}}:${github.head_ref}-${github.sha}" . --no-cache
+      
