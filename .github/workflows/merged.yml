@@ -9,18 +9,12 @@ on:
 
 jobs:
   build:
-    name: Build and publish image
+    name: Build and Publish image
     runs-on: ubuntu-latest
 
     steps:
     - name: Change git URLs to use SSH
       run: echo -e '[url "git@github.com:"]\n  insteadOf = "https://github.com/"' >> ~/.gitconfig
-
-    - name: Login to DockerHub
-      uses: docker/login-action@v1 
-      with:
-        username: stefanmcshane
-        password: ${{ secrets.IMAGE_REGISTRY_PASSWORD }}
 
     - name: Checkout code
       uses: actions/checkout@v2
@@ -28,8 +22,9 @@ jobs:
         submodules: recursive
         ssh-key: ${{ secrets.SSH_MACHINE_KEY }}
     
-    - name: Build and publish image
+    - name: Build and Publish image
       run: |
+        echo ${{ secrets.IMAGE_REGISTRY_PASSWORD }} | docker login --username foo --password-stdin
         docker build  -t "stefanmcshane/${{github.repository}}:latest" -t "stefanmcshane/${{github.repository}}:${{github.sha}}" . -f Dockerfile
         docker push stefanmcshane/${{github.repository}}:latest
         docker push stefanmcshane/${{github.repository}}:${{github.sha}}
