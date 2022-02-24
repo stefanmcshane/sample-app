@@ -30,6 +30,7 @@ jobs:
         docker push stefanmcshane/${{ github.event.repository.name }}:${{ github.sha }}
 
     - name: Build manifest for dev
+      id: generate-deployment-manifest
       uses: stefanprodan/kube-tools@v1
       with: 
         kustomize: 4.5.2
@@ -53,6 +54,8 @@ jobs:
         repository: stefanmcshane/deployment
 
     - name: Update manifest in deployment repo
+      run: |
+        echo ${{ steps.generate-deployment-manifest.outputs.tagged_manifest }} > dev/manifest.yml
 
     - name: Create Pull Request in deployment repo
       uses: peter-evans/create-pull-request@v3
