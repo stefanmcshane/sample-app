@@ -12,7 +12,7 @@ jobs:
     container:
       image: stefanmcshane/go-ci-tools:latest
       credentials:
-          username: ${{ secrets.IMAGE_REGISTRY_USERNAME}}
+          username: stefanmcshane
           password: ${{ secrets.IMAGE_REGISTRY_PASSWORD}}
     steps:
 
