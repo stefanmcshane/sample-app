@@ -22,12 +22,12 @@ jobs:
         submodules: recursive
         ssh-key: ${{ secrets.SSH_MACHINE_KEY }}
     
-    - name: Build and Publish image
-      run: |
-        echo ${{ secrets.IMAGE_REGISTRY_PASSWORD }} | docker login --username stefanmcshane --password-stdin
-        docker build  -t "stefanmcshane/${{ github.event.repository.name }}:latest" -t "stefanmcshane/${{ github.event.repository.name }}:${{ github.sha }}" . -f Dockerfile
-        docker push stefanmcshane/${{ github.event.repository.name }}:latest
-        docker push stefanmcshane/${{ github.event.repository.name }}:${{ github.sha }}
+    # - name: Build and Publish image
+    #   run: |
+    #     echo ${{ secrets.IMAGE_REGISTRY_PASSWORD }} | docker login --username stefanmcshane --password-stdin
+    #     docker build  -t "stefanmcshane/${{ github.event.repository.name }}:latest" -t "stefanmcshane/${{ github.event.repository.name }}:${{ github.sha }}" . -f Dockerfile
+    #     docker push stefanmcshane/${{ github.event.repository.name }}:latest
+    #     docker push stefanmcshane/${{ github.event.repository.name }}:${{ github.sha }}
 
     - name: Build manifest for dev
       id: generate-deployment-manifest
@@ -37,7 +37,8 @@ jobs:
         command: |
           cd deploy/dev
           kustomize edit set image "*:${{github.sha}}" 
-          echo ::set-output name=tagged_manifest::$(kustomize build)
+          cd ../../../
+          kustomize build sample-app/deploy/dev > manifest.yml
 
     - name: Connect to Deployment repo
       uses: getsentry/action-github-app-token@v1
@@ -55,7 +56,7 @@ jobs:
 
     - name: Update manifest in deployment repo
       run: |
-        echo ${{ steps.generate-deployment-manifest.outputs.tagged_manifest }} > dev/manifest.yml
+        cp ../manifest.yml > dev/
 
     - name: Create Pull Request in deployment repo
       uses: peter-evans/create-pull-request@v3
