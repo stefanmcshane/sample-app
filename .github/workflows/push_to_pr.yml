@@ -14,8 +14,8 @@ jobs:
       credentials:
           username: stefanmcshane
           password: ${{ secrets.IMAGE_REGISTRY_PASSWORD}}
+    
     steps:
-
     - name: Fix up git URLs
       run: echo -e '[url "git@github.com:"]\n  insteadOf = "https://github.com/"' >> ~/.gitconfig
 

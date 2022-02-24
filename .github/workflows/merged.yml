@@ -3,7 +3,9 @@ name: Create and Publish Image
 # on:
 #   pull_request:
 #     branches: [ main ]
-on: push
+on:
+  push:
+    branches: [ main ]
 
 jobs:
   build:
