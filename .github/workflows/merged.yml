@@ -27,5 +27,5 @@ jobs:
       
     - name: Lint
       run: |
-        docker build  -t "stefanmcshane/${{github.repository}}:latest" -t "stefanmcshane/${{github.repository}}:${github.head_ref}-${github.sha}" . --no-cache
+        docker build  -t "stefanmcshane/${{github.repository}}:latest" -t "stefanmcshane/${{github.repository}}:${{github.head_ref}}-${{github.sha}}" . --no-cache
       
