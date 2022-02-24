@@ -25,6 +25,6 @@ jobs:
     - name: Build and Publish image
       run: |
         echo ${{ secrets.IMAGE_REGISTRY_PASSWORD }} | docker login --username stefanmcshane --password-stdin
-        docker build  -t "stefanmcshane/${{github.repository}}:latest" -t "stefanmcshane/${{github.repository}}:${{github.sha}}" . -f Dockerfile
-        docker push stefanmcshane/${{github.repository}}:latest
-        docker push stefanmcshane/${{github.repository}}:${{github.sha}}
+        docker build  -t "stefanmcshane/${{github.repository.name}}:latest" -t "stefanmcshane/${{github.repository.name}}:${{github.sha}}" . -f Dockerfile
+        docker push stefanmcshane/${{github.repository.name}}:latest
+        docker push stefanmcshane/${{github.repository.name}}:${{github.sha}}
