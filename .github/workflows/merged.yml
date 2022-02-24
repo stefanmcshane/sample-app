@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: Build and Publish image
+    name: Build and Publish Image to dev
     runs-on: ubuntu-latest
 
     steps:
@@ -25,9 +25,9 @@ jobs:
     - name: Build and Publish image
       run: |
         echo ${{ secrets.IMAGE_REGISTRY_PASSWORD }} | docker login --username stefanmcshane --password-stdin
-        docker build  -t "stefanmcshane/${{ github.event.repository.name }}:latest" -t "stefanmcshane/${{ github.event.repository.name }}:${{github.sha}}" . -f Dockerfile
+        docker build  -t "stefanmcshane/${{ github.event.repository.name }}:latest" -t "stefanmcshane/${{ github.event.repository.name }}:${{ github.sha }}" . -f Dockerfile
         docker push stefanmcshane/${{ github.event.repository.name }}:latest
-        docker push stefanmcshane/${{ github.event.repository.name }}:${{github.sha}}
+        docker push stefanmcshane/${{ github.event.repository.name }}:${{ github.sha }}
 
     - name: Build manifest for dev
       uses: stefanprodan/kube-tools@v1
@@ -36,4 +36,27 @@ jobs:
         command: |
           cd deploy/dev
           kustomize edit set image "*:${{github.sha}}" 
-          kustomize build
+          echo ::set-output name=tagged_manifest::$(kustomize build)
+
+    - name: Connect to Deployment repo
+      uses: tibdex/github-app-token@v1
+      id: generate-token
+      with:
+        app_id: ${{ secrets.GH_APP_ID }}
+        private_key: ${{ secrets.GH_APP_KEY }}
+
+    - name: Checkout deployment repo
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+        ssh-key: ${{ secrets.SSH_MACHINE_KEY }}
+        repository: stefanmcshane/deployment
+
+    - name: Update manifest in deployment repo
+
+    - name: Create Pull Request in deployment repo
+      uses: peter-evans/create-pull-request@v3
+      with:
+        token: ${{ steps.generate-token.outputs.token }}
+        title: Update ${{ github.event.repository.name }} manifest for dev
+        body: Update ${{ github.event.repository.name }} manifest for dev to ${{ github.sha }}
