@@ -37,7 +37,7 @@ jobs:
       run: |
         cd deploy/dev
         kustomize edit set image "*:${{github.sha}}" 
-        kustomize build > generated-manifest.yml
+        echo ::set-output name=tagged_manifest::$(kustomize build | base64)
 
     - name: Connect to Deployment repo
       uses: getsentry/action-github-app-token@v1
@@ -55,10 +55,7 @@ jobs:
 
     - name: Update manifest in deployment repo
       run: |
-        ls ../${{ github.event.repository.name }}
-        echo test
-        ls ~
-        cp ../${{ github.event.repository.name }}/deploy/dev/generated-manifest.yml dev/manifest.yml
+        echo ${{ steps.generate-deployment-manifest.outputs.tagged_manifest  }} | base64 -d > dev/manifest.yml
 
     - name: Create Pull Request in deployment repo
       uses: peter-evans/create-pull-request@v3
