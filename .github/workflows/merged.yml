@@ -34,5 +34,5 @@ jobs:
       with:
         push: true
         tags: |
-          stefanmcshane/${{github.repository}}:latest
-          stefanmcshane/${{github.repository}}:${{github.head_ref}}-${{github.sha}}
+          ${{github.repository}}:latest
+          ${{github.repository}}:${{github.head_ref}}-${{github.sha}}
