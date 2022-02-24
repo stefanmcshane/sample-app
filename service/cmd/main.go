@@ -19,5 +19,5 @@ func main() {
 }
 
 func sayHello(s string) string {
-	return fmt.Sprintf("whats up, %s", s)
+	return fmt.Sprintf("hi there, %s", s)
 }
