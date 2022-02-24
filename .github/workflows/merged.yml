@@ -55,6 +55,8 @@ jobs:
 
     - name: Update manifest in deployment repo
       run: |
+        ls 
+        ls ../
         cp ../${{ github.event.repository.name }}/deploy/dev/generated-manifest.yml dev/manifest.yml
 
     - name: Create Pull Request in deployment repo
