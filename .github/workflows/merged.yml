@@ -35,4 +35,4 @@ jobs:
         push: true
         tags: |
           ${{github.repository}}:latest
-          ${{github.repository}}:${{github.head_ref}}-${{github.sha}}
+          ${{github.repository}}:${{github.sha}}
