@@ -9,12 +9,12 @@ import (
 
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello, %s!", sayHello(r.URL.Path[1:]))
+		fmt.Fprintf(w, "%s!", sayHello(r.URL.Path[1:]))
 	})
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func sayHello(s string) string {
-	return fmt.Sprintf("hello, %s", s)
+	return fmt.Sprintf("goodbye, %s", s)
 }
