@@ -7,11 +7,11 @@ on:
 
 jobs:
   build:
-    name: Go ${{ matrix.go }} Validation
+    name: Go Validation
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        go: [ '1.17' ]
+    container:
+      image:
+        stefanmcshane/go-ci-tools:latest
     
     steps:
 
@@ -23,18 +23,10 @@ jobs:
       with:
         submodules: recursive
         ssh-key: ${{ secrets.SSH_MACHINE_KEY }}
+      
+    - name: Lint
+      run: make lint
 
-    - name: Setup Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: ${{ matrix.go }}
-      
-    - name: Install dependencies
-      run: make install-tools
-      
-    - name: Check for breaking changes
-      run: make break
-      
-    - name: Lint protos and go ${{ matrix.go }} code
-      run: make lint go-lint
+    - name: Run unit tests
+      run: make test
       

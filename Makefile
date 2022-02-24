@@ -2,10 +2,12 @@ include common/make/common.mk
 
 SERVICE=sample-app # Ensure the service name matches the name of the repo
 
+DIFF_COVERAGE_EXPECTED=50
+
 ## Top level
 build: go-build ## Run all builds for this repo
 clean: go-clean proto-clean ## Clean up anything extra folders
-lint: go-lint proto-lint docker-lint ## Run all available linters
+lint: go-lint  ## Run all available linters
 test: go-test ## Run all available unit tests
 test-coverage: go-test-cov-html ## Open browser with test coverage tool
 test-integration: go-test-integration ## Run all available integration tests
