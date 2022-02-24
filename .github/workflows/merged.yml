@@ -59,7 +59,16 @@ jobs:
 
     - name: Create Pull Request in deployment repo
       uses: peter-evans/create-pull-request@v3
+      id: deployDevPR
       with:
         token: ${{ steps.generate-token.outputs.token }}
         title: Update ${{ github.event.repository.name }} manifest for dev
         body: Update ${{ github.event.repository.name }} manifest for dev to ${{ github.sha }}
+    
+    - name: Enable Pull Request Automerge
+      if: steps.deployDevPR.outputs.pull-request-operation == 'created'
+      uses: peter-evans/enable-pull-request-automerge@v1
+      with:
+          token: ${{ steps.generate-token.outputs.token }}
+        pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
+        merge-method: squash
