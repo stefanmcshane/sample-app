@@ -55,7 +55,7 @@ jobs:
 
     - name: Update manifest in deployment repo
       run: |
-        base64 -d <<< ${{ steps.generate-deployment-manifest.outputs.tagged_manifest }} > dev/manifest.yml
+        base64 -d <<< "${{ steps.generate-deployment-manifest.outputs.tagged_manifest }}" > dev/manifest.yml
 
     - name: Create Pull Request in deployment repo
       uses: peter-evans/create-pull-request@v3
