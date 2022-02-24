@@ -28,3 +28,12 @@ jobs:
         docker build  -t "stefanmcshane/${{ github.event.repository.name }}:latest" -t "stefanmcshane/${{ github.event.repository.name }}:${{github.sha}}" . -f Dockerfile
         docker push stefanmcshane/${{ github.event.repository.name }}:latest
         docker push stefanmcshane/${{ github.event.repository.name }}:${{github.sha}}
+
+    - name: Build manifest for dev
+      uses: stefanprodan/kube-tools@v1
+      with: 
+        kustomize: 4.5.2
+        command: |
+          cd deploy/dev
+          kustomize edit set image "*:${{github.sha}}" 
+          kustomize build
