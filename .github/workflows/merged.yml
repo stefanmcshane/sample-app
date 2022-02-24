@@ -29,11 +29,11 @@ jobs:
     #     docker push stefanmcshane/${{ github.event.repository.name }}:latest
     #     docker push stefanmcshane/${{ github.event.repository.name }}:${{ github.sha }}
 
-    - name: Build manifest for dev
+    - name: Setup Kustomize
       id: generate-deployment-manifest
       uses: imranismail/setup-kustomize@v1
-      with: 
-        kustomize-version: 4.5.2
+
+    - name: Build manifest for dev
       run: |
         cd deploy/dev
         kustomize edit set image "*:${{github.sha}}" 
