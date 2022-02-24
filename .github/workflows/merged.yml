@@ -30,10 +30,10 @@ jobs:
     #     docker push stefanmcshane/${{ github.event.repository.name }}:${{ github.sha }}
 
     - name: Setup Kustomize
-      id: generate-deployment-manifest
       uses: imranismail/setup-kustomize@v1
 
     - name: Build manifest for dev
+      id: generate-deployment-manifest
       run: |
         cd deploy/dev
         kustomize edit set image "*:${{github.sha}}" 
