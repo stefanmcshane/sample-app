@@ -31,13 +31,13 @@ jobs:
 
     - name: Build manifest for dev
       id: generate-deployment-manifest
-      uses: stefanprodan/kube-tools@v1
+      uses: imranismail/setup-kustomize@v1
       with: 
-        kustomize: 4.5.2
-        command: |
-          cd deploy/dev
-          kustomize edit set image "*:${{github.sha}}" 
-          kustomize build > generated-manifest.yml
+        kustomize-version: 4.5.2
+      run: |
+        cd deploy/dev
+        kustomize edit set image "*:${{github.sha}}" 
+        kustomize build > generated-manifest.yml
 
     - name: Connect to Deployment repo
       uses: getsentry/action-github-app-token@v1
@@ -55,7 +55,7 @@ jobs:
 
     - name: Update manifest in deployment repo
       run: |
-        cp ../${{ github.event.repository.name }}/deploy/dev/generated-manifest.yml > dev/
+        cp ../${{ github.event.repository.name }}/deploy/dev/generated-manifest.yml > dev
 
     - name: Create Pull Request in deployment repo
       uses: peter-evans/create-pull-request@v3
