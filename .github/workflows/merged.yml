@@ -22,12 +22,12 @@ jobs:
         submodules: recursive
         ssh-key: ${{ secrets.SSH_MACHINE_KEY }}
     
-    # - name: Build and Publish image
-    #   run: |
-    #     echo ${{ secrets.IMAGE_REGISTRY_PASSWORD }} | docker login --username stefanmcshane --password-stdin
-    #     docker build  -t "stefanmcshane/${{ github.event.repository.name }}:latest" -t "stefanmcshane/${{ github.event.repository.name }}:${{ github.sha }}" . -f Dockerfile
-    #     docker push stefanmcshane/${{ github.event.repository.name }}:latest
-    #     docker push stefanmcshane/${{ github.event.repository.name }}:${{ github.sha }}
+    - name: Build and Publish image
+      run: |
+        echo ${{ secrets.IMAGE_REGISTRY_PASSWORD }} | docker login --username stefanmcshane --password-stdin
+        docker build  -t "stefanmcshane/${{ github.event.repository.name }}:latest" -t "stefanmcshane/${{ github.event.repository.name }}:${{ github.sha }}" . -f Dockerfile
+        docker push stefanmcshane/${{ github.event.repository.name }}:latest
+        docker push stefanmcshane/${{ github.event.repository.name }}:${{ github.sha }}
 
     - name: Setup Kustomize
       uses: imranismail/setup-kustomize@v1
