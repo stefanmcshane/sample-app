@@ -71,6 +71,8 @@ jobs:
         aws eks --region us-west-2 update-kubeconfig --name development-eks
 
     - uses: Azure/k8s-deploy@v1.2
+      env:
+        KUBE_CONFIG: "/home/runner/.kube/config"
       with:
         action: deploy
         manifests: ${{ steps.generate-deployment-manifest.outputs.tagged_manifest }} | base64 -di
