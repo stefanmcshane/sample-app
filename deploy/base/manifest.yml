@@ -49,11 +49,11 @@ apiVersion: argoproj.io/v1alpha1
 kind: AnalysisTemplate
 metadata:
   name: integration-tests
-  annotations:
-    argocd.argoproj.io/hook: PostSync
+  # annotations:
+  #   argocd.argoproj.io/hook: PostSync
+  #   argocd.argoproj.io/hook-delete-policy: HookSucceeded
+  #   argocd.argoproj.io/sync-wave: "0"
 spec:
-  args:
-  - name: service-address
   metrics:
   - name: integration-tests
     successCondition: result.state.exitCode == 0
