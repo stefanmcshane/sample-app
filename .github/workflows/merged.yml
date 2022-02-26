@@ -67,9 +67,11 @@ jobs:
         echo ::set-output name=tagged_manifest::$(kustomize build | base64)
     
     - name: kubecontxt
+      env:
+        AWS_ACCOUNT_ID: ${{ steps.secrets.outputs.aws-account-id }}
       run: |
         aws eks --region us-west-2 update-kubeconfig --name development-eks
-        kubectl config use-context development-eks
+        kubectl config use-context arn:aws:eks:us-west-2:$AWS_ACCOUNT_ID:cluster/development-eks
 
     - name: deploy
       uses: Azure/k8s-deploy@v1.2
