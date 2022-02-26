@@ -26,7 +26,7 @@ spec:
           - -c
           - |
             sleep 5
-            /sample-app/bin/sample-app       
+            /sample-app/bin/sample-app
         ports:
         - containerPort: 7833
   strategy: {}
@@ -71,10 +71,11 @@ spec:
 #                 imagePullPolicy: Always
 #                 command: ["/bin/bash", "-c", "/sample-app/bin/sample-app integration {{args.service-address}}"]
 #               restartPolicy: Never  
+---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: after
+  name: after-deploy
   annotations:
     argocd.argoproj.io/hook: PostSync
     argocd.argoproj.io/hook-delete-policy: HookSucceeded
@@ -90,7 +91,7 @@ spec:
           - -c
           - |
             sleep 5
-            /sample-app/bin/sample-app integration sample-app-service:7833
+            /sample-app/bin/sample-app integration sample-app-service:7834
       restartPolicy: Never
   backoffLimit: 1
 ---
