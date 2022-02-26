@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -26,8 +25,9 @@ func IntegrationTestsForCheckingRollout(address string) error {
 		}
 	}
 
-	if fail != 0 {
-		return errors.New("failure with intg tests")
+	if fail == 5 {
+		return fmt.Errorf("failure with intg tests %d", fail)
 	}
+	fmt.Println("success with intg", fail)
 	return nil
 }
