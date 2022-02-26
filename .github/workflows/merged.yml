@@ -50,10 +50,11 @@ jobs:
         IMAGE_TAG: ${{ github.sha }}
       run: |
         docker build -t temp/temp -f Dockerfile .
-        docker tag temp/temp $ECR_REGISTRY/${{ github.event.repository.name }}:latest
-        docker tag temp/temp $ECR_REGISTRY${{ github.event.repository.name }}:${{ github.sha }}
-        docker push $ECR_REGISTRY/${{ github.event.repository.name }}:latest
-        docker push $ECR_REGISTRY${{ github.event.repository.name }}:${{ github.sha }} 
+        REPO="$ECR_REGISTRY/${{ github.event.repository.name }}"
+        docker tag temp/temp $REPO:latest
+        docker tag temp/temp $REPO:${{ github.sha }}
+        docker push $REPO:latest
+        docker push $REPO:${{ github.sha }} 
 
     - name: Setup Kustomize
       uses: imranismail/setup-kustomize@v1

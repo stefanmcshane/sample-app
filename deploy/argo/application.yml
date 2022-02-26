@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: deployment-demo
+spec:
+  destination:
+    name: ''
+    namespace: default
+    server: 'https://5ECC8F005B8F4739FC458B7C06A96689.gr7.us-west-2.eks.amazonaws.com'
+  source:
+    path: dev
+    repoURL: 'git@github.com:perchcredit/deployment-demo.git'
+    targetRevision: HEAD
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: false
