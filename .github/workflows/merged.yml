@@ -44,17 +44,17 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build and Publish image
-      env: 
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: ${{ github.sha }}
-        IMAGE_NAME: ${{ github.event.repository.name }}
-      run: |
-        docker build -t temp/temp -f Dockerfile .
-        docker tag temp/temp $ECR_REGISTRY/$IMAGE_NAME:latest
-        docker tag temp/temp $ECR_REGISTRY/$IMAGE_NAME:$IMAGE_TAG
-        docker push $ECR_REGISTRY/$IMAGE_NAME:latest
-        docker push $ECR_REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+    # - name: Build and Publish image
+    #   env: 
+    #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+    #     IMAGE_TAG: ${{ github.sha }}
+    #     IMAGE_NAME: ${{ github.event.repository.name }}
+    #   run: |
+    #     docker build -t temp/temp -f Dockerfile .
+    #     docker tag temp/temp $ECR_REGISTRY/$IMAGE_NAME:latest
+    #     docker tag temp/temp $ECR_REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+    #     docker push $ECR_REGISTRY/$IMAGE_NAME:latest
+    #     docker push $ECR_REGISTRY/$IMAGE_NAME:$IMAGE_TAG
 
     - name: Setup Kustomize
       uses: imranismail/setup-kustomize@v1
@@ -65,32 +65,41 @@ jobs:
         cd deploy/dev
         kustomize edit set image "*:${{github.sha}}" 
         echo ::set-output name=tagged_manifest::$(kustomize build | base64)
-
-    - name: Connect to Deployment repo
-      uses: getsentry/action-github-app-token@v1
-      id: generate-token
-      with:
-        app_id: ${{ secrets.GH_APP_ID }}
-        private_key: ${{ secrets.GH_APP_KEY }}
-
-    - name: Checkout deployment repo
-      uses: actions/checkout@v2
-      with:
-        submodules: recursive
-        ssh-key: ${{ secrets.SSH_MACHINE_KEY }}
-        repository: PerchCredit/deployment-demo
-
-    - name: Update manifest in deployment repo
+    
+    - name: kubecontxt
       run: |
-        echo "${{ steps.generate-deployment-manifest.outputs.tagged_manifest }}" | base64 -di > dev/manifest.yml
+        aws eks --region us-west-2 update-kubeconfig --name development-eks
 
-    - name: Create Pull Request in deployment repo
-      uses: peter-evans/create-pull-request@v3
-      id: deployDevPR
+    - uses: Azure/k8s-deploy@v1.2
       with:
-        token: ${{ steps.generate-token.outputs.token }}
-        title: Update ${{ github.event.repository.name }} manifest for dev
-        body: Update ${{ github.event.repository.name }} manifest for dev to ${{ github.sha }}
+        action: deploy
+        manifests: ${{ steps.generate-deployment-manifest.outputs.tagged_manifest }} | base64 -di
+
+    # - name: Connect to Deployment repo
+    #   uses: getsentry/action-github-app-token@v1
+    #   id: generate-token
+    #   with:
+    #     app_id: ${{ secrets.GH_APP_ID }}
+    #     private_key: ${{ secrets.GH_APP_KEY }}
+
+    # - name: Checkout deployment repo
+    #   uses: actions/checkout@v2
+    #   with:
+    #     submodules: recursive
+    #     ssh-key: ${{ secrets.SSH_MACHINE_KEY }}
+    #     repository: PerchCredit/deployment-demo
+
+    # - name: Update manifest in deployment repo
+    #   run: |
+    #     echo "${{ steps.generate-deployment-manifest.outputs.tagged_manifest }}" | base64 -di > dev/manifest.yml
+
+    # - name: Create Pull Request in deployment repo
+    #   uses: peter-evans/create-pull-request@v3
+    #   id: deployDevPR
+    #   with:
+    #     token: ${{ steps.generate-token.outputs.token }}
+    #     title: Update ${{ github.event.repository.name }} manifest for dev
+    #     body: Update ${{ github.event.repository.name }} manifest for dev to ${{ github.sha }}
     
     # https://github.com/peter-evans/enable-pull-request-automerge#conditions
     # - name: Enable Pull Request Automerge
