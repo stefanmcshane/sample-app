@@ -9,10 +9,12 @@ import (
 )
 
 func main() {
+	fmt.Println(os.Args)
 
 	if len(os.Args) > 1 {
 		if os.Args[1] == "integration" {
-			err := IntegrationTestsForCheckingRollout()
+			address := os.Args[2]
+			err := IntegrationTestsForCheckingRollout(address)
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -21,19 +23,19 @@ func main() {
 	}
 
 	runServer()
-
 }
 
 func runServer() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("request received from %s\n", r.Host)
-		fmt.Fprintf(w, "%s!", sayHello(r.URL.Path[1:]))
+		fmt.Fprintf(w, "hello %s!", sayHello(r.URL.Path[1:]))
 	})
 	http.HandleFunc("/healthz/ready", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	})
 
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	fmt.Println("starting server")
+	log.Fatal(http.ListenAndServe(":7833", nil))
 }
 
 func sayHello(s string) string {

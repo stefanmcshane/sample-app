@@ -2,17 +2,19 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 )
 
-func IntegrationTestsForCheckingRollout() error {
+func IntegrationTestsForCheckingRollout(address string) error {
 	fail := 0
 
 	for i := 0; i < 5; i++ {
 		time.Sleep(2 * time.Second)
-
-		resp, err := http.Get("http://sample-app-service:8080/stefan")
+		url := fmt.Sprintf("http://%s/%d", address, i)
+		fmt.Println(url)
+		resp, err := http.Get(url)
 		if err != nil {
 			fail = fail + 1
 			continue

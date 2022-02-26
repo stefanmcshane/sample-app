@@ -19,8 +19,16 @@ spec:
         image: 447866867700.dkr.ecr.us-west-2.amazonaws.com/stefan-demo:latest
         command: ["/bin/bash", "-c", "/sample-app/bin/sample-app"]
         ports:
-        - containerPort: 8080
-  strategy: {}
+        - containerPort: 7833
+  strategy: 
+    canary:
+      analysis:
+        templates:
+        - templateName: integration-tests
+        startingStep: 1
+        args:
+        - name: service-address
+          value: sample-app-service.default.svc.cluster.local:8080
     # canary:
     #   steps:
     #   - setWeight: 20
@@ -32,22 +40,42 @@ spec:
     #   - setWeight: 80
     #   - pause: {duration: 120s}
 ---
-apiVersion: batch/v1
-kind: Job
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
 metadata:
-  name: after
-  annotations:
-    argocd.argoproj.io/hook: PostSync
-    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+  name: integration-tests
 spec:
-  template:
-    spec:
-      containers:
-      - name: sample-app-integration-tests
-        image: 447866867700.dkr.ecr.us-west-2.amazonaws.com/stefan-demo:latest
-        command: ["/bin/bash", "-c", "/sample-app/bin/sample-app integration"]
-      restartPolicy: Never
-  backoffLimit: 0
+  args:
+  - name: service-address
+  metrics:
+  - name: integration-tests
+    provider:
+      job:
+        spec:
+          backoffLimit: 1
+          template:
+            spec:
+              containers:
+              - name: sample-app-integration-tests
+                image: 447866867700.dkr.ecr.us-west-2.amazonaws.com/stefan-demo:latest
+                command: ["/bin/bash", "-c", "/sample-app/bin/sample-app integration {{args.service-address}}"]
+              restartPolicy: Never  
+# apiVersion: batch/v1
+# kind: Job
+# metadata:
+#   name: after
+#   annotations:
+#     argocd.argoproj.io/hook: PostSync
+#     argocd.argoproj.io/hook-delete-policy: HookSucceeded
+# spec:
+#   template:
+#     spec:
+#       containers:
+#       - name: sample-app-integration-tests
+#         image: 447866867700.dkr.ecr.us-west-2.amazonaws.com/stefan-demo:latest
+#         command: ["/bin/bash", "-c", "/sample-app/bin/sample-app integration"]
+#       restartPolicy: Never
+#   backoffLimit: 1
 ---
 kind: Service 
 apiVersion: v1 
@@ -58,5 +86,5 @@ spec:
     app: sample-app
   ports:
     - name: sample-app-service-port
-      port: 8080 
-      targetPort: 80
+      port: 7833 
+      targetPort: 7833
