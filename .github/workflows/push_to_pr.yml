@@ -1,7 +1,6 @@
 name: Push to PR
 
-# on: push
-on:
+on: 
   pull_request:
     branches: [ main ]
 
@@ -16,6 +15,27 @@ jobs:
           password: ${{ secrets.IMAGE_REGISTRY_PASSWORD}}
     
     steps:
+    - name: Import Secrets
+      id: secrets
+      uses: hashicorp/vault-action@v2.3.1
+      with:
+        url: https://default-cluster.vault.ce447047-e51d-4eb7-bd36-0b25f028a101.aws.hashicorp.cloud:8200
+        method: approle
+        roleId: ${{ secrets.VAULT_APP_ROLE_ID }}
+        secretId: ${{ secrets.VAULT_APP_ROLE_SECRET }}
+        namespace: admin
+        exportEnv: true
+        secrets: | # Sample for getting a secret. Format = VAULT_PATH FIELD_IN_VALUE | NAME_TO_SET_AS_FOR_THIS_ACTION ;
+          secrets/internal/aws/access_key_id value | AWS_ACCESS_KEY_ID ;
+          secrets/internal/aws/secret_access_key vaulue | AWS_SECRET_ACCESS_KEY ; 
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ steps.secrets.outputs.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{steps.secrets.outputs.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-west-2
+
     - name: Change git URLs to use SSH
       run: echo -e '[url "git@github.com:"]\n  insteadOf = "https://github.com/"' >> ~/.gitconfig
 

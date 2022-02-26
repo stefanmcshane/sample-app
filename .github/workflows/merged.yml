@@ -1,8 +1,5 @@
 name: On Merge
 
-# on:
-#   pull_request:
-#     branches: [ main ]
 on:
   push:
     branches: [ main ]
@@ -24,10 +21,10 @@ jobs:
     
     - name: Build and Publish image
       run: |
-        echo ${{ secrets.IMAGE_REGISTRY_PASSWORD }} | docker login --username stefanmcshane --password-stdin
-        docker build  -t "stefanmcshane/${{ github.event.repository.name }}:latest" -t "stefanmcshane/${{ github.event.repository.name }}:${{ github.sha }}" . -f Dockerfile
-        docker push stefanmcshane/${{ github.event.repository.name }}:latest
-        docker push stefanmcshane/${{ github.event.repository.name }}:${{ github.sha }}
+        echo ${{ secrets.IMAGE_REGISTRY_PASSWORD }} | docker login --username 447866867700.dkr.ecr.us-west-2.amazonaws.com --password-stdin
+        docker build  -t "447866867700.dkr.ecr.us-west-2.amazonaws.com/${{ github.event.repository.name }}:latest" -t "447866867700.dkr.ecr.us-west-2.amazonaws.com/${{ github.event.repository.name }}:${{ github.sha }}" . -f Dockerfile
+        docker push 447866867700.dkr.ecr.us-west-2.amazonaws.com/${{ github.event.repository.name }}:latest
+        docker push 447866867700.dkr.ecr.us-west-2.amazonaws.com/${{ github.event.repository.name }}:${{ github.sha }}
 
     - name: Setup Kustomize
       uses: imranismail/setup-kustomize@v1
@@ -51,7 +48,7 @@ jobs:
       with:
         submodules: recursive
         ssh-key: ${{ secrets.SSH_MACHINE_KEY }}
-        repository: stefanmcshane/deployment
+        repository: perchcredit/deployment-demo
 
     - name: Update manifest in deployment repo
       run: |
