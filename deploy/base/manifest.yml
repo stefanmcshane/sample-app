@@ -17,6 +17,7 @@ spec:
       containers:
       - name: sample-app
         image: 447866867700.dkr.ecr.us-west-2.amazonaws.com/stefan-demo:latest
+        command: ["/bin/bash", "-c", "/sample-app/bin/sample-app]
         ports:
         - containerPort: 8080
   strategy:
