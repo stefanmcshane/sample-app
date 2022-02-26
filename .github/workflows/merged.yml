@@ -45,6 +45,9 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v1
 
     - name: testing
+      env: 
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
       run: |
         docker pull 447866867700.dkr.ecr.us-west-2.amazonaws.com/mobley:latest
         docker pull $ECR_REGISTRY/sepiol:latest
