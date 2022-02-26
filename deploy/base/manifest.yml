@@ -31,19 +31,13 @@ spec:
         - containerPort: 7833
   # strategy: {}
     strategy: 
-      analysis:
-        templates:
-        - templateName: integration-tests
-    # canary:
-    #   steps:
-    #   - setWeight: 20
-    #   - pause: {}
-    #   - setWeight: 40
-    #   - pause: {duration: 120s}
-    #   - setWeight: 60
-    #   - pause: {duration: 120s}
-    #   - setWeight: 80
-    #   - pause: {duration: 120s}
+      canary:
+        analysis:
+          templates:
+          - templateName: integration-tests
+        steps:
+        - setWeight: 80
+        - pause: {duration: 20s}
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: AnalysisTemplate
