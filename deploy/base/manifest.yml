@@ -29,13 +29,17 @@ spec:
         - containerPort: 7833
   strategy: 
     canary:
-      analysis:
-        templates:
-        - templateName: integration-tests
-        - templateName: integration-tests-after
       steps:
-      - setWeight: 80
-      - pause: {duration: 20s}
+      - setWeight: 20
+      - pause: {duration: 60s}
+      - analysis:
+          templates:
+          - templateName: integration-tests
+      - setWeight: 40
+      - pause: {duration: 2m}
+      - analysis:
+          templates:
+          - templateName: integration-tests
 ---
 apiVersion: argoproj.io/v1alpha1
 kind: AnalysisTemplate
@@ -58,41 +62,9 @@ spec:
                 command:
                   - /bin/bash
                   - -c
-                  - |
-                    sleep 5
-                    /sample-app/bin/sample-app integration sample-app-service:7833
+                  - /sample-app/bin/sample-app integration sample-app-service:7833
               restartPolicy: Never
 ---  
-apiVersion: argoproj.io/v1alpha1
-kind: AnalysisTemplate
-metadata:
-  name: integration-tests-after
-  annotations:
-    argocd.argoproj.io/hook: PostSync
-    argocd.argoproj.io/hook-delete-policy: HookSucceeded
-    argocd.argoproj.io/sync-wave: "2"
-spec:
-  metrics:
-  - name: integration-tests-after
-    successCondition: result.state.exitCode == 0
-    provider:
-      job:
-        spec:
-          backoffLimit: 1
-          template:
-            spec:
-              containers:
-              - name: sample-app-integration-tests
-                image: 447866867700.dkr.ecr.us-west-2.amazonaws.com/stefan-demo:latest
-                imagePullPolicy: Always
-                command:
-                  - /bin/bash
-                  - -c
-                  - |
-                    sleep 5
-                    /sample-app/bin/sample-app integration sample-app-service:7833
-              restartPolicy: Never  
----
 # apiVersion: batch/v1
 # kind: Job
 # metadata:

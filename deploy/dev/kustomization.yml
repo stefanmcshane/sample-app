@@ -2,3 +2,6 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
 - ../base
+images:
+- name: '*'
+  newTag: fad7c38aa85e76a0e939b34a82c0f08a05d4d151
