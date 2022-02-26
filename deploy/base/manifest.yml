@@ -26,7 +26,7 @@ spec:
           - -c
           - |
             sleep 5
-            /sample-app/bin/sample-app integration sample-app-service:7833        
+            /sample-app/bin/sample-app       
         ports:
         - containerPort: 7833
   strategy: {}
