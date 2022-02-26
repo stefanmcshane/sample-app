@@ -13,18 +13,47 @@ jobs:
     - name: Change git URLs to use SSH
       run: echo -e '[url "git@github.com:"]\n  insteadOf = "https://github.com/"' >> ~/.gitconfig
 
+    - name: Import Secrets
+      id: secrets
+      uses: hashicorp/vault-action@v2.3.1
+      with:
+        url: https://default-cluster.vault.ce447047-e51d-4eb7-bd36-0b25f028a101.aws.hashicorp.cloud:8200
+        method: approle
+        roleId: ${{ secrets.VAULT_APP_ROLE_ID }}
+        secretId: ${{ secrets.VAULT_APP_ROLE_SECRET }}
+        namespace: admin
+        exportEnv: true
+        secrets: | # Sample for getting a secret. Format = VAULT_PATH FIELD_IN_VALUE | NAME_TO_SET_AS_FOR_THIS_ACTION ;
+          secrets/internal/aws/access_key_id value | AWS_ACCESS_KEY_ID ;
+          secrets/internal/aws/secret_access_key vaulue | AWS_SECRET_ACCESS_KEY ; 
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ steps.secrets.outputs.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{steps.secrets.outputs.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-west-2
+        
     - name: Checkout code
       uses: actions/checkout@v2
       with:
         submodules: recursive
         ssh-key: ${{ secrets.SSH_MACHINE_KEY }}
     
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
     - name: Build and Publish image
+      env: 
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
       run: |
-        echo ${{ secrets.IMAGE_REGISTRY_PASSWORD }} | docker login --username 447866867700.dkr.ecr.us-west-2.amazonaws.com --password-stdin
-        docker build  -t "447866867700.dkr.ecr.us-west-2.amazonaws.com/${{ github.event.repository.name }}:latest" -t "447866867700.dkr.ecr.us-west-2.amazonaws.com/${{ github.event.repository.name }}:${{ github.sha }}" . -f Dockerfile
-        docker push 447866867700.dkr.ecr.us-west-2.amazonaws.com/${{ github.event.repository.name }}:latest
-        docker push 447866867700.dkr.ecr.us-west-2.amazonaws.com/${{ github.event.repository.name }}:${{ github.sha }}
+        docker build -t temp/temp -f Dockerfile .
+        docker tag temp/temp "$ECR_REGISTRY/${{ github.event.repository.name }}:latest" 
+        docker tag temp/temp "$ECR_REGISTRY${{ github.event.repository.name }}:${{ github.sha }}" 
+        docker push "$ECR_REGISTRY/${{ github.event.repository.name }}:latest" 
+        docker push "$ECR_REGISTRY${{ github.event.repository.name }}:${{ github.sha }}" 
 
     - name: Setup Kustomize
       uses: imranismail/setup-kustomize@v1
