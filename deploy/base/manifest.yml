@@ -91,7 +91,7 @@ spec:
           - -c
           - |
             sleep 5
-            /sample-app/bin/sample-app integration sample-app-service:7834
+            /sample-app/bin/sample-app integration sample-app-service:7833
       restartPolicy: Never
   backoffLimit: 1
 ---
