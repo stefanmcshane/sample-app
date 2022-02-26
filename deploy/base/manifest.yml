@@ -28,7 +28,7 @@ spec:
         startingStep: 1
         args:
         - name: service-address
-          value: sample-app-service.default.svc.cluster.local:8080
+          value: sample-app-service.default.svc.cluster.local:1234
     # canary:
     #   steps:
     #   - setWeight: 20
@@ -44,11 +44,14 @@ apiVersion: argoproj.io/v1alpha1
 kind: AnalysisTemplate
 metadata:
   name: integration-tests
+  annotations:
+    argocd.argoproj.io/hook: PostSync
 spec:
   args:
   - name: service-address
   metrics:
   - name: integration-tests
+    successCondition: result == 0
     provider:
       job:
         spec:
