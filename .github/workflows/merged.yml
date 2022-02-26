@@ -29,7 +29,7 @@ jobs:
           secrets/internal/stefan-demo GH_APP_ID | GH_APP_ID ; 
           secrets/internal/stefan-demo GH_APP_KEY | GH_APP_KEY ; 
           secrets/internal/stefan-demo IMAGE_REGISTRY_PASSWORD | IMAGE_REGISTRY_PASSWORD ; 
-          secrets/internal/stefan-demo SSH_MACHINE_KEY | outputs.SSH_MACHINE_KEY  ; 
+          secrets/internal/stefan-demo SSH_MACHINE_KEY | SSH_MACHINE_KEY   ; 
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
