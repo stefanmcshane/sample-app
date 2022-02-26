@@ -6,16 +6,14 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 )
 
 func main() {
-	fmt.Println(os.Args)
+	fmt.Println("stefan", os.Args)
 
 	if len(os.Args) > 1 {
+		fmt.Println(os.Args[2])
 		if os.Args[1] == "integration" {
-			time.Sleep(20 * time.Second)
-			os.Exit(1)
 			address := os.Args[2]
 			err := IntegrationTestsForCheckingRollout(address)
 			if err != nil {

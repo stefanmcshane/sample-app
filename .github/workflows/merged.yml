@@ -26,6 +26,10 @@ jobs:
         secrets: | # Sample for getting a secret. Format = VAULT_PATH FIELD_IN_VALUE | NAME_TO_SET_AS_FOR_THIS_ACTION ;
           secrets/internal/aws/access_key_id value | AWS_ACCESS_KEY_ID ;
           secrets/internal/aws/secret_access_key value | AWS_SECRET_ACCESS_KEY ; 
+          secrets/internal/stefan-demo GH_APP_ID | GH_APP_ID ; 
+          secrets/internal/stefan-demo GH_APP_KEY | GH_APP_KEY ; 
+          secrets/internal/stefan-demo IMAGE_REGISTRY_PASSWORD | IMAGE_REGISTRY_PASSWORD ; 
+          secrets/internal/stefan-demo SSH_MACHINE_KEY | outputs.SSH_MACHINE_KEY  ; 
 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -38,7 +42,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         submodules: recursive
-        ssh-key: ${{ secrets.SSH_MACHINE_KEY }}
+        ssh-key: ${{ steps.secrets.outputs.SSH_MACHINE_KEY }}
     
     - name: Login to Amazon ECR
       id: login-ecr
@@ -65,19 +69,6 @@ jobs:
         cd deploy/dev
         kustomize edit set image "*:${{github.sha}}" 
         echo ::set-output name=tagged_manifest::$(kustomize build | base64)
-    
-    - name: kubecontxt
-      run: |
-        aws eks --region us-west-2 update-kubeconfig --name development-eks
-        kubectl config use-context arn:aws:eks:us-west-2:${{ steps.secrets.outputs.aws-account-id }}:cluster/development-eks
-
-    - name: deploy
-      uses: Azure/k8s-deploy@v1.2
-      env:
-        KUBE_CONFIG: "/home/runner/.kube/config"
-      with:
-        action: deploy
-        manifests: ${{ steps.generate-deployment-manifest.outputs.tagged_manifest }} | base64 -di
 
     # - name: Connect to Deployment repo
     #   uses: getsentry/action-github-app-token@v1

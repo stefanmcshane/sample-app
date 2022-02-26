@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
       - name: sample-app
-        image: 447866867700.dkr.ecr.us-west-2.amazonaws.com/stefan-demo:latest
+        imagePullPolicy: Always
+        image: 447866867700.dkr.ecr.us-west-2.amazonaws.com/stefan-demo:v2.0.1
         command: ["/bin/bash", "-c", "/sample-app/bin/sample-app"]
         ports:
         - containerPort: 7833
@@ -25,10 +26,9 @@ spec:
       analysis:
         templates:
         - templateName: integration-tests
-        startingStep: 1
         args:
         - name: service-address
-          value: sample-app-service.default.svc.cluster.local:1234
+          value: sample-app-service:7833
     # canary:
     #   steps:
     #   - setWeight: 20
@@ -51,7 +51,7 @@ spec:
   - name: service-address
   metrics:
   - name: integration-tests
-    successCondition: result == 0
+    successCondition: result.state.exitCode == 0
     provider:
       job:
         spec:
@@ -60,7 +60,8 @@ spec:
             spec:
               containers:
               - name: sample-app-integration-tests
-                image: 447866867700.dkr.ecr.us-west-2.amazonaws.com/stefan-demo:latest
+                image: 447866867700.dkr.ecr.us-west-2.amazonaws.com/stefan-demo:v2.0.1
+                imagePullPolicy: Always
                 command: ["/bin/bash", "-c", "/sample-app/bin/sample-app integration {{args.service-address}}"]
               restartPolicy: Never  
 # apiVersion: batch/v1

@@ -9,7 +9,8 @@ import (
 
 func IntegrationTestsForCheckingRollout(address string) error {
 	fail := 0
-
+	u := fmt.Sprintf("http://%s", address)
+	fmt.Println(u)
 	for i := 0; i < 5; i++ {
 		time.Sleep(2 * time.Second)
 		url := fmt.Sprintf("http://%s/%d", address, i)
