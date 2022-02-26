@@ -31,7 +31,7 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-access-key-id: ${{ steps.secrets.outputs.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{steps.secrets.outputs.AWS_SECRET_ACCESS_KEY }}
+        aws-secret-access-key: ${{ steps.secrets.outputs.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-west-2
         
     - name: Checkout code
@@ -51,6 +51,7 @@ jobs:
       run: |
         docker build -t temp/temp -f Dockerfile .
         REPO="$ECR_REGISTRY/${{ github.event.repository.name }}"
+        echo $REPO
         docker tag temp/temp $REPO:latest
         docker tag temp/temp $REPO:${{ github.sha }}
         docker push $REPO:latest
