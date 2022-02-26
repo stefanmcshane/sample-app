@@ -49,9 +49,7 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        # docker build -t temp/temp -f Dockerfile .
-        echo $ECR_REGISTRY/${{ github.event.repository.name }}:latest
-        echo "$ECR_REGISTRY/${{ github.event.repository.name }}:latest"
+        docker build -t temp/temp -f Dockerfile .
         docker tag temp/temp $ECR_REGISTRY/${{ github.event.repository.name }}:latest
         docker tag temp/temp $ECR_REGISTRY${{ github.event.repository.name }}:${{ github.sha }}
         docker push $ECR_REGISTRY/${{ github.event.repository.name }}:latest
