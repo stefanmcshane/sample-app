@@ -20,19 +20,17 @@ spec:
         command: ["/bin/bash", "-c", "/sample-app/bin/sample-app"]
         ports:
         - containerPort: 8080
-  strategy:
-    canary:
-      steps:
-      - setWeight: 20
-      # The following pause step will pause the rollout indefinitely until manually resumed.
-      # Rollouts can be manually resumed by running `kubectl argo rollouts promote ROLLOUT`
-      - pause: {}
-      - setWeight: 40
-      - pause: {duration: 120s}
-      - setWeight: 60
-      - pause: {duration: 120s}
-      - setWeight: 80
-      - pause: {duration: 120s}
+  strategy: {}
+    # canary:
+    #   steps:
+    #   - setWeight: 20
+    #   - pause: {}
+    #   - setWeight: 40
+    #   - pause: {duration: 120s}
+    #   - setWeight: 60
+    #   - pause: {duration: 120s}
+    #   - setWeight: 80
+    #   - pause: {duration: 120s}
 ---
 apiVersion: batch/v1
 kind: Job
