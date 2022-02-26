@@ -34,6 +34,23 @@ spec:
       - setWeight: 80
       - pause: {duration: 120s}
 ---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: after
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      containers:
+      - name: sample-app-integration-tests
+        image: 447866867700.dkr.ecr.us-west-2.amazonaws.com/stefan-demo:latest
+        command: ["/bin/bash", "-c", "/sample-app/bin/sample-app integration"]
+      restartPolicy: Never
+  backoffLimit: 0
+---
 kind: Service 
 apiVersion: v1 
 metadata:
