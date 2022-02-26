@@ -14,6 +14,7 @@ func IntegrationTestsForCheckingRollout(address string) error {
 		time.Sleep(2 * time.Second)
 		url := fmt.Sprintf("http://%s/%d", address, i)
 		fmt.Println(url)
+		http.DefaultClient.Timeout = time.Second * 2
 		resp, err := http.Get(url)
 		if err != nil {
 			fmt.Println(err, url)
