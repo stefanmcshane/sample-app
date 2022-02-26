@@ -78,7 +78,7 @@ jobs:
       with:
         submodules: recursive
         ssh-key: ${{ secrets.SSH_MACHINE_KEY }}
-        repository: perchcredit/deployment-demo
+        repository: PerchCredit/deployment-demo
 
     - name: Update manifest in deployment repo
       run: |

@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: sample-app
-        image: stefanmcshane/sample-app:latest
+        image: 447866867700.dkr.ecr.us-west-2.amazonaws.com/stefan-demo:latest
         ports:
         - containerPort: 8080
   strategy:
