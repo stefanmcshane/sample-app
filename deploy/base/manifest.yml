@@ -21,11 +21,15 @@ spec:
       - name: sample-app
         imagePullPolicy: Always
         image: 447866867700.dkr.ecr.us-west-2.amazonaws.com/stefan-demo:v2.0.1
-        command: ["/bin/bash", "-c", "/sample-app/bin/sample-app"]
+        command:
+          - /bin/bash
+          - -c
+          - |
+            sleep 5
+            /sample-app/bin/sample-app integration sample-app-service:7833        
         ports:
         - containerPort: 7833
-  strategy: 
-    canary: {}
+  strategy: {}
       # analysis:
       #   templates:
       #   - templateName: integration-tests
@@ -81,7 +85,12 @@ spec:
       containers:
       - name: sample-app-integration-tests
         image: 447866867700.dkr.ecr.us-west-2.amazonaws.com/stefan-demo:latest
-        command: ["/bin/bash", "-c", "sleep 5; /sample-app/bin/sample-app integration sample-app-service:7833"]
+        command: 
+          - /bin/bash
+          - -c
+          - |
+            sleep 5
+            /sample-app/bin/sample-app integration sample-app-service:7833
       restartPolicy: Never
   backoffLimit: 1
 ---
