@@ -1,5 +1,5 @@
 [submodule "common"]
 	path = common
-	url = https://github.com/stefanmcshane/common.git
+	url = https://github.com/PerchCredit/common.git
 [submodule "main"]
 	branch = .
