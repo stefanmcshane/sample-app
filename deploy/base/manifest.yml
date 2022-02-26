@@ -1,7 +1,7 @@
-# apiVersion: argoproj.io/v1alpha1
-# kind: Rollout
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+# apiVersion: apps/v1
+# kind: Deployment
 metadata:
   name: sample-app
   labels:
@@ -29,13 +29,11 @@ spec:
             /sample-app/bin/sample-app
         ports:
         - containerPort: 7833
-  strategy: {}
-      # analysis:
-      #   templates:
-      #   - templateName: integration-tests
-      #   args:
-      #   - name: service-address
-      #     value: sample-app-service:7833
+  # strategy: {}
+    strategy: 
+      analysis:
+        templates:
+        - templateName: integration-tests
     # canary:
     #   steps:
     #   - setWeight: 20
@@ -47,53 +45,58 @@ spec:
     #   - setWeight: 80
     #   - pause: {duration: 120s}
 ---
-# apiVersion: argoproj.io/v1alpha1
-# kind: AnalysisTemplate
-# metadata:
-#   name: integration-tests
-#   annotations:
-#     argocd.argoproj.io/hook: PostSync
-# spec:
-#   args:
-#   - name: service-address
-#   metrics:
-#   - name: integration-tests
-#     successCondition: result.state.exitCode == 0
-#     provider:
-#       job:
-#         spec:
-#           backoffLimit: 1
-#           template:
-#             spec:
-#               containers:
-#               - name: sample-app-integration-tests
-#                 image: 447866867700.dkr.ecr.us-west-2.amazonaws.com/stefan-demo:v2.0.1
-#                 imagePullPolicy: Always
-#                 command: ["/bin/bash", "-c", "/sample-app/bin/sample-app integration {{args.service-address}}"]
-#               restartPolicy: Never  
----
-apiVersion: batch/v1
-kind: Job
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
 metadata:
-  name: after-deploy
+  name: integration-tests
   annotations:
     argocd.argoproj.io/hook: PostSync
-    argocd.argoproj.io/hook-delete-policy: HookSucceeded
-    argocd.argoproj.io/sync-wave: "0"
 spec:
-  template:
-    spec:
-      containers:
-      - name: sample-app-integration-tests
-        image: 447866867700.dkr.ecr.us-west-2.amazonaws.com/stefan-demo:latest
-        command: 
-          - /bin/bash
-          - -c
-          - |
-            sleep 5
-            /sample-app/bin/sample-app integration sample-app-service:7833
-      restartPolicy: Never
-  backoffLimit: 1
+  args:
+  - name: service-address
+  metrics:
+  - name: integration-tests
+    successCondition: result.state.exitCode == 0
+    provider:
+      job:
+        spec:
+          backoffLimit: 1
+          template:
+            spec:
+              containers:
+              - name: sample-app-integration-tests
+                image: 447866867700.dkr.ecr.us-west-2.amazonaws.com/stefan-demo:latest
+                imagePullPolicy: Always
+                command:
+                  - /bin/bash
+                  - -c
+                  - |
+                    sleep 5
+                    /sample-app/bin/sample-app integration sample-app-service:7833
+              restartPolicy: Never  
+---
+# apiVersion: batch/v1
+# kind: Job
+# metadata:
+#   name: after-deploy
+#   annotations:
+#     argocd.argoproj.io/hook: PostSync
+#     argocd.argoproj.io/hook-delete-policy: HookSucceeded
+#     argocd.argoproj.io/sync-wave: "0"
+# spec:
+#   template:
+#     spec:
+#       containers:
+#       - name: sample-app-integration-tests
+#         image: 447866867700.dkr.ecr.us-west-2.amazonaws.com/stefan-demo:latest
+#         command: 
+#           - /bin/bash
+#           - -c
+#           - |
+#             sleep 5
+#             /sample-app/bin/sample-app integration sample-app-service:7833
+#       restartPolicy: Never
+#   backoffLimit: 1
 ---
 kind: Service 
 apiVersion: v1 
