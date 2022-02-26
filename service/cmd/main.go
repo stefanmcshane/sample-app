@@ -40,5 +40,5 @@ func runServer() {
 }
 
 func sayHello(s string) string {
-	return fmt.Sprintf("hi, %s", s)
+	return fmt.Sprintf("hello, %s", s)
 }
