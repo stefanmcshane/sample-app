@@ -16,11 +16,13 @@ func IntegrationTestsForCheckingRollout(address string) error {
 		fmt.Println(url)
 		resp, err := http.Get(url)
 		if err != nil {
+			fmt.Println(err, url)
 			fail = fail + 1
 			continue
 		}
 
 		if resp.StatusCode != http.StatusOK {
+			fmt.Println(resp.StatusCode, url)
 			fail = fail + 1
 		}
 	}
