@@ -64,9 +64,13 @@ jobs:
       uses: imranismail/setup-kustomize@v1
 
 ## Development PR
+  devPR:
+    name: Create PR and deploy in dev
+    runs-on: ubuntu-latest
 
+    steps:
     - name: Build manifest for dev
-      id: generate-deployment-manifest
+      id: generate-dev-deployment-manifest
       run: |
         cd deploy/dev
         echo ::set-output name=dev_manifest_before_changes::$(kustomize build | base64)
@@ -89,7 +93,7 @@ jobs:
 
     - name: Update manifest in deployment repo
       run: |
-        echo "${{ steps.generate-deployment-manifest.outputs.tagged_manifest }}" | base64 -di > dev/manifest.yml
+        echo "${{ steps.generate-dev-deployment-manifest.outputs.tagged_manifest }}" | base64 -di > dev/manifest.yml
 
     - name: Create Pull Request in deployment repo
       uses: peter-evans/create-pull-request@v3
@@ -109,11 +113,24 @@ jobs:
           merge-method: squash
 
 ## Staging PR
-    - name: Checkout code
+  stagingPR:
+    name: Create PR for staging
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Connect to Deployment repo
+      uses: getsentry/action-github-app-token@v1
+      id: generate-token
+      with:
+        app_id: ${{ steps.secrets.outputs.GH_APP_ID }}
+        private_key: ${{ steps.secrets.outputs.GH_APP_KEY }}
+
+    - name: Checkout deployment repo
       uses: actions/checkout@v2
       with:
         submodules: recursive
         ssh-key: ${{ steps.secrets.outputs.SSH_MACHINE_KEY }}
+        repository: PerchCredit/deployment-demo
 
     - name: Build manifest for staging
       id: generate-staging-deployment-manifest
