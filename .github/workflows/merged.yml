@@ -60,22 +60,14 @@ jobs:
     #     docker push $ECR_REGISTRY/$IMAGE_NAME:latest
     #     docker push $ECR_REGISTRY/$IMAGE_NAME:$IMAGE_TAG
 
-    - name: Setup Kustomize
-      uses: imranismail/setup-kustomize@v1
-
 ## Development PR
   devPR:
     name: Create PR and deploy in dev
     runs-on: ubuntu-latest
 
     steps:
-    - name: Build manifest for dev
-      id: generate-dev-deployment-manifest
-      run: |
-        cd deploy/dev
-        echo ::set-output name=dev_manifest_before_changes::$(kustomize build | base64)
-        kustomize edit set image "*:${{github.sha}}" 
-        echo ::set-output name=tagged_manifest::$(kustomize build | base64)
+    - name: Setup Kustomize
+      uses: imranismail/setup-kustomize@v1
 
     - name: Connect to Deployment repo
       uses: getsentry/action-github-app-token@v1
@@ -90,6 +82,14 @@ jobs:
         submodules: recursive
         ssh-key: ${{ steps.secrets.outputs.SSH_MACHINE_KEY }}
         repository: PerchCredit/deployment-demo
+
+    - name: Build manifest for dev
+      id: generate-dev-deployment-manifest
+      run: |
+        cd deploy/dev
+        echo ::set-output name=dev_manifest_before_changes::$(kustomize build | base64)
+        kustomize edit set image "*:${{github.sha}}" 
+        echo ::set-output name=tagged_manifest::$(kustomize build | base64)
 
     - name: Update manifest in deployment repo
       run: |
@@ -119,6 +119,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Setup Kustomize
+      uses: imranismail/setup-kustomize@v1
+
     - name: Connect to Deployment repo
       uses: getsentry/action-github-app-token@v1
       id: generate-token
