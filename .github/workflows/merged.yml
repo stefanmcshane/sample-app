@@ -111,6 +111,7 @@ jobs:
           token: ${{ steps.generate-token.outputs.token }}
           pull-request-number: ${{ steps.deployDevPR.outputs.pull-request-number }}
           merge-method: squash
+          repository: PerchCredit/deployment-demo
 
 ## Staging PR
   stagingPR:
