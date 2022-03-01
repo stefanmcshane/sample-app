@@ -5,7 +5,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  buildImage:
     name: Build and Publish Image to dev
     runs-on: ubuntu-latest
 
@@ -64,8 +64,24 @@ jobs:
   devPR:
     name: Create PR and deploy in dev
     runs-on: ubuntu-latest
+    needs: buildImage
 
     steps:
+    - name: Import Secrets
+      id: secrets
+      uses: hashicorp/vault-action@v2.3.1
+      with:
+        url: https://default-cluster.vault.ce447047-e51d-4eb7-bd36-0b25f028a101.aws.hashicorp.cloud:8200
+        method: approle
+        roleId: ${{ secrets.VAULT_APP_ROLE_ID }}
+        secretId: ${{ secrets.VAULT_APP_ROLE_SECRET }}
+        namespace: admin
+        exportEnv: true
+        secrets: | # Sample for getting a secret. Format = VAULT_PATH FIELD_IN_VALUE | NAME_TO_SET_AS_FOR_THIS_ACTION ;
+          secrets/internal/stefan-demo GH_APP_ID | GH_APP_ID ; 
+          secrets/internal/stefan-demo GH_APP_KEY | GH_APP_KEY ; 
+          secrets/internal/stefan-demo SSH_MACHINE_KEY | SSH_MACHINE_KEY   ; 
+
     - name: Setup Kustomize
       uses: imranismail/setup-kustomize@v1
 
@@ -117,8 +133,24 @@ jobs:
   stagingPR:
     name: Create PR for staging
     runs-on: ubuntu-latest
+    needs: buildImage
 
     steps:
+    - name: Import Secrets
+      id: secrets
+      uses: hashicorp/vault-action@v2.3.1
+      with:
+        url: https://default-cluster.vault.ce447047-e51d-4eb7-bd36-0b25f028a101.aws.hashicorp.cloud:8200
+        method: approle
+        roleId: ${{ secrets.VAULT_APP_ROLE_ID }}
+        secretId: ${{ secrets.VAULT_APP_ROLE_SECRET }}
+        namespace: admin
+        exportEnv: true
+        secrets: | # Sample for getting a secret. Format = VAULT_PATH FIELD_IN_VALUE | NAME_TO_SET_AS_FOR_THIS_ACTION ;
+          secrets/internal/stefan-demo GH_APP_ID | GH_APP_ID ; 
+          secrets/internal/stefan-demo GH_APP_KEY | GH_APP_KEY ; 
+          secrets/internal/stefan-demo SSH_MACHINE_KEY | SSH_MACHINE_KEY   ; 
+
     - name: Setup Kustomize
       uses: imranismail/setup-kustomize@v1
 
