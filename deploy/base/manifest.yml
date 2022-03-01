@@ -48,7 +48,7 @@ metadata:
 spec:
   metrics:
   - name: integration-tests
-    successCondition: "{{=jsonpath(result.status.exitCode) == 0}}"
+    successCondition: result.status.exitCode == 0
     provider:
       job:
         spec:
