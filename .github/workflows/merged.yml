@@ -67,6 +67,9 @@ jobs:
     needs: buildImage
 
     steps:
+    - name: Change git URLs to use SSH
+      run: echo -e '[url "git@github.com:"]\n  insteadOf = "https://github.com/"' >> ~/.gitconfig
+
     - name: Import Secrets
       id: secrets
       uses: hashicorp/vault-action@v2.3.1
@@ -141,6 +144,9 @@ jobs:
     needs: devPR
 
     steps:
+    - name: Change git URLs to use SSH
+      run: echo -e '[url "git@github.com:"]\n  insteadOf = "https://github.com/"' >> ~/.gitconfig
+    
     - name: Import Secrets
       id: secrets
       uses: hashicorp/vault-action@v2.3.1
