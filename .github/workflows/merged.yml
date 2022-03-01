@@ -63,10 +63,13 @@ jobs:
     - name: Setup Kustomize
       uses: imranismail/setup-kustomize@v1
 
+## Development PR
+
     - name: Build manifest for dev
       id: generate-deployment-manifest
       run: |
         cd deploy/dev
+        echo ::set-output name=dev_manifest_before_changes::$(kustomize build | base64)
         kustomize edit set image "*:${{github.sha}}" 
         echo ::set-output name=tagged_manifest::$(kustomize build | base64)
 
@@ -97,10 +100,35 @@ jobs:
         body: Update ${{ github.event.repository.name }} manifest for dev to ${{ github.sha }}
     
     # https://github.com/peter-evans/enable-pull-request-automerge#conditions
-    - name: Enable Pull Request Automerge
+    - name: Automerge and to dev
       if: steps.deployDevPR.outputs.pull-request-operation == 'created'
       uses: peter-evans/enable-pull-request-automerge@v1
       with:
           token: ${{ steps.generate-token.outputs.token }}
           pull-request-number: ${{ steps.deployDevPR.outputs.pull-request-number }}
           merge-method: squash
+
+## Staging PR
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+        ssh-key: ${{ steps.secrets.outputs.SSH_MACHINE_KEY }}
+
+    - name: Build manifest for staging
+      id: generate-staging-deployment-manifest
+      run: |
+        cd deploy/staging
+        kustomize edit set image "*:${{github.sha}}" 
+        echo ::set-output name=tagged_manifest::$(kustomize build | base64)
+
+    - name: Update manifest in deployment repo
+      run: |
+        echo "${{ steps.generate-staging-deployment-manifest.outputs.tagged_manifest }}" | base64 -di > staging/manifest.yml
+
+    - name: Create Pull Request in deployment repo
+      uses: peter-evans/create-pull-request@v3
+      with:
+        token: ${{ steps.generate-token.outputs.token }}
+        title: Update ${{ github.event.repository.name }} manifest for staging
+        body: Update ${{ github.event.repository.name }} manifest for staging to ${{ github.sha }}
