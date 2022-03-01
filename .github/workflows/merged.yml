@@ -85,6 +85,19 @@ jobs:
     - name: Setup Kustomize
       uses: imranismail/setup-kustomize@v1
 
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+        ssh-key: ${{ steps.secrets.outputs.SSH_MACHINE_KEY }}
+
+    - name: Build manifest for dev
+      id: generate-dev-deployment-manifest
+      run: |
+        cd deploy/dev
+        kustomize edit set image "*:${{github.sha}}" 
+        echo ::set-output name=tagged_manifest::$(kustomize build | base64)
+
     - name: Connect to Deployment repo
       uses: getsentry/action-github-app-token@v1
       id: generate-token
@@ -98,14 +111,6 @@ jobs:
         submodules: recursive
         ssh-key: ${{ steps.secrets.outputs.SSH_MACHINE_KEY }}
         repository: PerchCredit/deployment-demo
-
-    - name: Build manifest for dev
-      id: generate-dev-deployment-manifest
-      run: |
-        cd deploy/dev
-        echo ::set-output name=dev_manifest_before_changes::$(kustomize build | base64)
-        kustomize edit set image "*:${{github.sha}}" 
-        echo ::set-output name=tagged_manifest::$(kustomize build | base64)
 
     - name: Update manifest in deployment repo
       run: |
@@ -133,7 +138,7 @@ jobs:
   stagingPR:
     name: Create PR for staging
     runs-on: ubuntu-latest
-    needs: buildImage
+    needs: devPR
 
     steps:
     - name: Import Secrets
@@ -153,6 +158,12 @@ jobs:
 
     - name: Setup Kustomize
       uses: imranismail/setup-kustomize@v1
+
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
+        ssh-key: ${{ steps.secrets.outputs.SSH_MACHINE_KEY }}
 
     - name: Connect to Deployment repo
       uses: getsentry/action-github-app-token@v1
