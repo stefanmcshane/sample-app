@@ -119,23 +119,29 @@ jobs:
       run: |
         echo "${{ steps.generate-dev-deployment-manifest.outputs.tagged_manifest }}" | base64 -di > dev/manifest.yml
 
-    - name: Create Pull Request in deployment repo
-      uses: peter-evans/create-pull-request@v3
-      id: deployDevPR
-      with:
-        token: ${{ steps.generate-token.outputs.token }}
-        title: Update ${{ github.event.repository.name }} manifest for dev
-        body: Update ${{ github.event.repository.name }} manifest for dev to ${{ github.sha }}
+    - name: Push changes to dev
+      run: |
+        git add .
+        git commit -m "Update manifest for dev to ${{ github.sha }}"
+        git push
+
+    # - name: Create Pull Request in deployment repo
+    #   uses: peter-evans/create-pull-request@v3
+    #   id: deployDevPR
+    #   with:
+    #     token: ${{ steps.generate-token.outputs.token }}
+    #     title: Update ${{ github.event.repository.name }} manifest for dev
+    #     body: Update ${{ github.event.repository.name }} manifest for dev to ${{ github.sha }}
     
-    # https://github.com/peter-evans/enable-pull-request-automerge#conditions
-    - name: Automerge and to dev
-      if: steps.deployDevPR.outputs.pull-request-operation == 'created'
-      uses: peter-evans/enable-pull-request-automerge@v1
-      with:
-          token: ${{ steps.generate-token.outputs.token }}
-          pull-request-number: ${{ steps.deployDevPR.outputs.pull-request-number }}
-          merge-method: squash
-          repository: PerchCredit/deployment-demo
+    # # https://github.com/peter-evans/enable-pull-request-automerge#conditions
+    # - name: Automerge and to dev
+    #   if: steps.deployDevPR.outputs.pull-request-operation == 'created'
+    #   uses: peter-evans/enable-pull-request-automerge@v1
+    #   with:
+    #       token: ${{ steps.generate-token.outputs.token }}
+    #       pull-request-number: ${{ steps.deployDevPR.outputs.pull-request-number }}
+    #       merge-method: squash
+    #       repository: PerchCredit/deployment-demo
 
 ## Staging PR
   stagingPR:
