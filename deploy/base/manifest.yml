@@ -31,12 +31,12 @@ spec:
     canary:
       steps:
       - setWeight: 20
-      - pause: {duration: 60s}
+      - pause: {duration: 10s}
       - analysis:
           templates:
           - templateName: integration-tests
       - setWeight: 40
-      - pause: {duration: 2m}
+      - pause: {duration: 60s}
       - analysis:
           templates:
           - templateName: integration-tests
