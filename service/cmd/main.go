@@ -36,7 +36,7 @@ func runServer() {
 	})
 
 	fmt.Println("starting server")
-	log.Fatal(http.ListenAndServe(":7836", nil))
+	log.Fatal(http.ListenAndServe(":7835", nil))
 }
 
 func sayHello(s string) string {
