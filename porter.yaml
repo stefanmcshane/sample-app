@@ -1,5 +1,5 @@
 apps:
-  "sample app":
+  "sampleapp":
     run: bin/sample-app
     type: web
   sample-app-2:
